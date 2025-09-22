@@ -79,17 +79,7 @@ const WhyChoose = () => (
           need for complex deployments.
         </p>
       </div>
-      <div className="bg-slate-800/50 p-6 rounded-2xl shadow-lg hover:scale-105 transform transition-all duration-300 md:col-span-2">
-        <h3 className="text-xl font-semibold text-purple-300 mb-2">
-          Empowering First-Generation Learners
-        </h3>
-        <p>
-          By providing tailored recommendations, InternSight helps
-          first-generation learners identify and apply for internships that
-          match their skills and interests, bridging the gap to meaningful
-          career opportunities.
-        </p>
-      </div>
+      
     </div>
   </section>
 );
