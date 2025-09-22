@@ -6,14 +6,15 @@ Intern‑Sight is a recommendation system for internship opportunities, designed
 
 ## 🛠️ Project Structure
 
-The repo is organized into two main directories:
+Repo Structure: Intern-Sight
 
-Intern‑Sight/
-├── backend/        # Server‑side logic (APIs, data models, recommendation engine)
+Intern-Sight/
+├── backend/        # Server-side logic (APIs, data models, recommendation engine)
 ├── frontend/       # UI client (React + Tailwind, etc.)
 ├── requirements.txt
 ├── .gitignore
 └── ...other configs
+
 
 ---
 
