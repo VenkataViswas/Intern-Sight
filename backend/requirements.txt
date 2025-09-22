@@ -1,10 +1,9 @@
-numpy 
-pandas 
-sentance-transformers
+numpy
+pandas
+sentence-transformers
 joblib
 scipy
-sklearn
+scikit-learn
 fastapi
 pydantic
-contextlib
 uvicorn
