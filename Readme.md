@@ -33,11 +33,9 @@ Here are the main technologies being used:
 
 | Component     | Technology / Library |
 |----------------|-----------------------|
-| Backend        | Node.js / Express (or similar REST API framework) + Database (e.g. MongoDB / PostgreSQL) |
-| Frontend       | React with Tailwind CSS |
-| UI/UX Styles   | Glassmorphism, Gradients, Accessible color schemes |
+| Backend        | Fast API - Python|
+| Frontend       | Vite + React with Tailwind CSS |
 | Version Control| Git + GitHub |
-
 ---
 
 ## 🔍 Getting Started
@@ -45,9 +43,9 @@ Here are the main technologies being used:
 ### Prerequisites
 
 - Node.js (v14+ recommended)  
-- Yarn or npm  
-- A database (local or cloud) configured with the backend  
-- Environment variables (if any, e.g. for DB connection, API keys)
+- npm (node package manager)
+- Pandas for data manipulations
+- Environment variables
 
 ### Running Locally
 
@@ -59,14 +57,14 @@ Here are the main technologies being used:
 2. Setup backend:
 
    cd backend
-   npm install         # or yarn
+   npm install
    # configure environment variables, e.g. .env file
    npm run dev         # or equivalent
 
 3. Setup frontend:
 
    cd ../frontend
-   npm install         # or yarn
+   npm install
    npm run dev         # or equivalent
 
 4. Open your browser and go to the frontend URL (often http://localhost:3000 depending on setup).
@@ -80,8 +78,6 @@ Here are likely endpoints (you’ll adjust paths based on your implementation):
 | Method | Endpoint                   | Description |
 |--------|-----------------------------|-------------|
 | POST   | `/recommendations`         | Accepts a profile input (skills, interests, experience, location) and returns recommended internships. |
-| GET    | `/internships`             | List or search internships (for admin or users, optional). |
-| GET    | `/profile/:userId`         | Fetch user profile (if saving / editing is supported). |
 
 ---
 
@@ -116,8 +112,8 @@ If you want to contribute:
 
 ## 📄 License & Contact
 
-- License: *[your chosen open source license]* (e.g. MIT)  
-- Contact: *Your name / email / project slack or Discord if you have one*
+- License: MIT
+- Contact: https://github.com/venkataviswas and the contributors
 
 ---
 
