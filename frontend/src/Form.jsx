@@ -12,6 +12,9 @@ const Form = () => {
   const [internships, setInternships] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
 
+  // ✅ API URL from .env (must start with VITE_)
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -19,7 +22,7 @@ const Form = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8000/recommendations", {
+      const res = await axios.post(`${API_URL}/recommendations`, {
         skills_text: formData.skills_text,
         area_of_interest: formData.area_of_interest,
         preferred_locations: formData.preferred_locations

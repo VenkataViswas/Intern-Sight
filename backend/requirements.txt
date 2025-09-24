@@ -7,3 +7,4 @@ scikit-learn
 fastapi
 pydantic
 uvicorn
+python-dotenv
