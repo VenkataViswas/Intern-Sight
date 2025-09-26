@@ -1,15 +1,15 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List
+import os
 import joblib
 import numpy as np
 import pandas as pd
+import scipy.sparse
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-import scipy.sparse
-import os
 from dotenv import load_dotenv
 
 # --- Load Environment Variables ---
@@ -44,63 +44,33 @@ INTERNSHIP_EMBEDDINGS = None
 INTERNSHIP_TITLE_EMBEDDINGS = None
 INTERNSHIPS_DF = None
 
-AVAILABLE_LOCATIONS = [
-    "Adambakkam", "Adilabad", "Agra", "Ahmedabad", "Aizawl", "Ajmer", "Akurdi", "Alwar", 
-    "Amaravati", "Ambala", "Ambala Cantt", "Ameerpet", "Amravati", "Amritsar", "Auraiya", 
-    "Aurangabad", "Balasore", "Bangalore", "Baran", "Begusarai", "Belgaum", "Bhagalpur", 
-    "Bhavnagar", "Bhilai", "Bhilwara", "Bhiwandi", "Bhopal", "Bhubaneswar", "Bikaner", 
-    "Bilimora", "Bokaro Steel City", "Chandigarh", "Chengalpattu", "Chennai", "Cochin", 
-    "Coimbatore", "Coimbatore North", "Cuttack", "Dehradun", "Delhi", "Dewa", "Dharamshala", 
-    "Dharwad", "Dholpur", "Dibiyapur", "Dindigul", "Durg", "East Godavari", "Erode", "Erragadda", 
-    "Faridabad", "Gandhinagar", "Ghaziabad", "Goa Velha", "Goregaon Kh", "Greater Noida", 
-    "Guntur", "Gurgaon", "Gwalior", "Gwalior West", "Haridwar", "Haryana", "Hubli", "Hyderabad", 
-    "Indore", "Itanagar", "Jabalpur", "Jaipur", "Jalandhar", "Jalna", "Jammu", "Jamshedpur", 
-    "Jangaon", "Jhalawar", "Jhansi", "Junagadh", "Kadiri", "Kakinada", "Kallakurichi", "Kalyan", 
-    "Kanchipuram", "Kanker", "Kannur", "Kanpur", "Kanyakumari", "Karimnagar", "Karnal", "Karur", 
-    "Kasol", "Keonjhar", "Khammam", "Kharar", "Khurdha", "Kochi", "Kodambakkam", "Kolkata", 
-    "Kota", "Krishnagiri", "Kumbakonam", "Kurnool", "Lucknow", "Ludhiana", "Madhapur", 
-    "Madipakkam", "Madurai", "Maharashtra", "Mahbubnagar", "Malegaon", "Manali", "Mandya", 
-    "Margao", "Mayiladuthurai", "Medak", "Meerut", "Mehsana", "Mira Bhayandar", "Miyapur", 
-    "Modinagar", "Mohali", "Mumbai", "Mysuru", "Nagapattinam", "Nagercoil", "Nagpur", "Nainital", 
-    "Namakkal", "Narasaraopeta", "Narsapur", "Nashik", "Navallur", "Navi Mumbai", "Noida", 
-    "Odisha", "Ooty", "Palitana", "Pallavaram", "Panchkula", "Panjim", "Patna", "Perambalur", 
-    "Perungudi", "Pimpri-Chinchwad", "Pitampura", "Pollachi", "Puducherry", "Pudukottai", "Pune", 
-    "Punewadi", "Punjab Small Industries Corporation (Pakistan)", "Puri", "Purnea", "Raipur", 
-    "Rajahmundry", "Rajarhat", "Rajkot", "Rajpura", "Rajsamand", "Ramanathapuram", "Ranchi", 
-    "Rohtak", "Sagar", "Salem", "Secunderabad", "Shahpur", "Shimla", "Sikar", "Sirsa", 
-    "Sivaganga", "Sivakasi", "Solan", "Sonepat", "Srikakulam", "Surajpur", "Surat", 
-    "Surendranagar", "Tambaram Sanatorium", "Tapi", "Thane", "Thanjavur", "Theni", "Thiruvallur", 
-    "Thiruvananthapuram", "Tirchy", "Tiruchirappalli", "Tirunelveli", "Tirupati", "Udaipur", 
-    "Ujjain", "Ulhasnagar", "Una", "Vadodara", "Vadodra", "Varanasi", "Vasai-Virar", "Vijayawada", 
-    "Viluppuram", "Virudhunagar", "Visakhapatnam", "Vyara", "Wakad", "Warangal", "West Medinipur", 
-    "Work From Home", "Zirakpur"
-]
+# --- Static Data ---
+AVAILABLE_LOCATIONS = [ "Bangalore", "Chennai", "Delhi", "Hyderabad", "Mumbai", 
+                       "Pune", "Visakhapatnam", "Remote", "Work From Home" ]
 
-AREAS_OF_INTEREST = [
-    "Android", "App", "App Development", "Backend", "Backend Development", "Development", 
-    "End", "End Development", "Engineering", "Management", "Mobile", "Mobile App", "Nodejs", 
-    "Php", "Php Development", "Python", "Software", "Software Development", "Stack", 
-    "Stack Development", "Testing", "Web", "Web Development", "Wordpress", "Wordpress Development"
-]
+AREAS_OF_INTEREST = [ "Web Development", "Backend Development", "Frontend Development", 
+                      "Mobile App", "Machine Learning", "Data Science", "AI", 
+                      "DevOps", "Testing", "Software Engineering" ]
 
 # --- Lifespan Manager ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global TFIDF_VECTORIZER, SENTENCE_MODEL, INTERNSHIP_TFIDF_VECTORS, INTERNSHIP_EMBEDDINGS, INTERNSHIP_TITLE_EMBEDDINGS, INTERNSHIPS_DF
     
-    print("Loading model artifacts...")
+    print("🔄 Loading model artifacts...")
     TFIDF_VECTORIZER = joblib.load(MODEL_TFIDF)
     INTERNSHIP_TFIDF_VECTORS = scipy.sparse.load_npz(MODEL_TFIDF_VECTORS)
     INTERNSHIP_EMBEDDINGS = np.load(MODEL_EMBEDDINGS)
-    SENTENCE_MODEL = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    INTERNSHIPS_DF = pd.read_csv(INTERNSHIPS_CSV).fillna('')
-    INTERNSHIP_TITLE_EMBEDDINGS = SENTENCE_MODEL.encode(INTERNSHIPS_DF['internship'].tolist())
-    print("Artifacts loaded successfully.")
+    SENTENCE_MODEL = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    INTERNSHIPS_DF = pd.read_csv(INTERNSHIPS_CSV).fillna("")
+    INTERNSHIP_TITLE_EMBEDDINGS = SENTENCE_MODEL.encode(INTERNSHIPS_DF["internship"].tolist())
+    print("✅ Artifacts loaded successfully.")
     yield
-    print("Shutting down.")
+    print("🛑 Shutting down.")
 
 # --- FastAPI App ---
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, title="Internship Recommendation API", version="1.0")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_URL],
@@ -110,6 +80,10 @@ app.add_middleware(
 )
 
 # --- API Endpoints ---
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/locations", response_model=List[str])
 def get_locations():
     return AVAILABLE_LOCATIONS
@@ -120,18 +94,18 @@ def get_interests():
 
 @app.post("/recommendations", response_model=List[Recommendation])
 def get_recommendations(candidate: CandidateProfile):
-    # --- 1. Skills Score ---
+    # --- Skills Score ---
     candidate_skills_tfidf = TFIDF_VECTORIZER.transform([candidate.skills_text])
     candidate_skills_embedding = SENTENCE_MODEL.encode([candidate.skills_text])
     s_tfidf = cosine_similarity(candidate_skills_tfidf, INTERNSHIP_TFIDF_VECTORS)[0]
     s_sem = cosine_similarity(candidate_skills_embedding, INTERNSHIP_EMBEDDINGS)[0]
     s_skills = (0.5 * s_tfidf) + (0.5 * s_sem)
 
-    # --- 2. Area of Interest Score ---
+    # --- Area of Interest Score ---
     candidate_interest_embedding = SENTENCE_MODEL.encode([candidate.area_of_interest])
     s_interest = cosine_similarity(candidate_interest_embedding, INTERNSHIP_TITLE_EMBEDDINGS)[0]
 
-    # --- 3. Location Score ---
+    # --- Location Score ---
     candidate_locations_set = set([loc.lower().strip() for loc in candidate.preferred_locations])
 
     def calculate_location_score(internship_loc):
@@ -144,14 +118,13 @@ def get_recommendations(candidate: CandidateProfile):
             return 0.8
         return 0.1
 
-    s_location = INTERNSHIPS_DF['location'].apply(calculate_location_score).to_numpy()
+    s_location = INTERNSHIPS_DF["location"].apply(calculate_location_score).to_numpy()
 
-    # --- 4. Final Weighted Score ---
+    # --- Final Weighted Score ---
     final_score = (0.60 * s_skills) + (0.25 * s_interest) + (0.15 * s_location)
 
-    # --- 5. Get Top 5 Recommendations ---
+    # --- Top 5 Recommendations ---
     top_5_indices = final_score.argsort()[-5:][::-1]
-
     recommendations = []
     for index in top_5_indices:
         internship_data = INTERNSHIPS_DF.iloc[index]
@@ -167,3 +140,14 @@ def get_recommendations(candidate: CandidateProfile):
             )
         )
     return recommendations
+
+
+# --- Main Entrypoint ---
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),
+        reload=os.getenv("RELOAD", "false").lower() == "true"
+    )
