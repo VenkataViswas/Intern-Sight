@@ -9,6 +9,7 @@ from sentence_transformers import SentenceTransformer
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import scipy.sparse
+import os
 
 # --- Pydantic Models ---
 class CandidateProfile(BaseModel):
@@ -51,7 +52,16 @@ async def lifespan(app: FastAPI):
     print("Shutting down.")
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+import os
+
+allowed_origin = os.environ.get("ALLOWED_ORIGIN", "*")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[allowed_origin] if allowed_origin != "*" else ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- API Endpoints ---
 @app.get("/locations", response_model=List[str])
