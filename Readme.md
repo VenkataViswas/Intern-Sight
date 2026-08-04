@@ -33,7 +33,7 @@ Here are the main technologies being used:
 
 | Component     | Technology / Library |
 |----------------|-----------------------|
-| Backend        | Node.js / Express (or similar REST API framework) + Database (e.g. MongoDB / PostgreSQL) |
+| Backend        | Node.js / Express (or similar REST API framework) + Database (e.g. MongoDB / PostgreSQL),FastAPI, Python |
 | Frontend       | React with Tailwind CSS |
 | UI/UX Styles   | Glassmorphism, Gradients, Accessible color schemes |
 | Version Control| Git + GitHub |
